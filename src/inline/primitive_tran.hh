@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   inline_primitive_tran.hh                          Personal Website       */
+/*   primitive_tran.hh                                 Personal Website       */
 /*                                                    ##################      */
 /*   By: Zian Huang <zianhuang00@gmail.com>           || room214n.com ||      */
 /*                                                    ##################      */
 /*   Created: 2022/11/10 10:02:28 by Zian Huang                               */
-/*   Updated: 2022/11/13 17:30:57 by Zian Huang                               */
+/*   Updated: 2022/11/16 12:16:12 by Zian Huang                               */
 /*                                                                            */
 /* ************************************************************************** */
 

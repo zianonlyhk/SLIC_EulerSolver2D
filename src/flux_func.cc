@@ -6,7 +6,7 @@
 /*   By: Zian Huang <zianhuang00@gmail.com>           || room214n.com ||      */
 /*                                                    ##################      */
 /*   Created: 2022/11/09 19:14:28 by Zian Huang                               */
-/*   Updated: 2022/11/14 15:14:26 by Zian Huang                               */
+/*   Updated: 2022/11/16 13:26:04 by Zian Huang                               */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ std::array<double, 4> FluxFVM::forceFlux_x(std::array<double, 4> i_uVector_i, st
     std::array<double, 4> lfFluxArr;
     std::array<double, 4> riTempArr;
 
-    lfFluxArr = sumCell(scalingCell(0.5 * i_dx * i_dt, diffCell(i_uVector_i, i_uVector_i_next)), scalingCell(0.5, sumCell(conservationFlux_x(i_uVector_i_next), conservationFlux_x(i_uVector_i))));
+    lfFluxArr = sumCell(scalingCell(0.5 * i_dx / i_dt, diffCell(i_uVector_i, i_uVector_i_next)), scalingCell(0.5, sumCell(conservationFlux_x(i_uVector_i_next), conservationFlux_x(i_uVector_i))));
     riTempArr = diffCell(scalingCell(0.5, sumCell(i_uVector_i, i_uVector_i_next)), scalingCell(0.5 * i_dt / i_dx, diffCell(conservationFlux_x(i_uVector_i_next), conservationFlux_x(i_uVector_i))));
 
     return scalingCell(0.5, sumCell(lfFluxArr, conservationFlux_x(riTempArr)));
@@ -58,7 +58,7 @@ std::array<double, 4> FluxFVM::forceFlux_y(std::array<double, 4> i_uVector_i, st
     std::array<double, 4> lfFluxArr;
     std::array<double, 4> riTempArr;
 
-    lfFluxArr = sumCell(scalingCell(0.5 * i_dy * i_dt, diffCell(i_uVector_i, i_uVector_i_next)), scalingCell(0.5, sumCell(conservationFlux_y(i_uVector_i_next), conservationFlux_y(i_uVector_i))));
+    lfFluxArr = sumCell(scalingCell(0.5 * i_dy / i_dt, diffCell(i_uVector_i, i_uVector_i_next)), scalingCell(0.5, sumCell(conservationFlux_y(i_uVector_i_next), conservationFlux_y(i_uVector_i))));
     riTempArr = diffCell(scalingCell(0.5, sumCell(i_uVector_i, i_uVector_i_next)), scalingCell(0.5 * i_dt / i_dy, diffCell(conservationFlux_y(i_uVector_i_next), conservationFlux_y(i_uVector_i))));
 
     return scalingCell(0.5, sumCell(lfFluxArr, conservationFlux_y(riTempArr)));
@@ -91,7 +91,7 @@ std::array<double, 4> FluxFVM::slicFlux_x(std::array<double, 4> i_uVector_0, std
 
     // locally half time evolve
     uVec_1_R = diffCell(uVec_1_R, scalingCell(0.5 * i_dt / i_dx, diffCell(conservationFlux_x(uVec_1_R), conservationFlux_x(uVec_1_L))));
-    uVec_2_L = diffCell(uVec_1_L, scalingCell(0.5 * i_dt / i_dx, diffCell(conservationFlux_x(uVec_1_R), conservationFlux_x(uVec_1_L))));
+    uVec_2_L = diffCell(uVec_2_L, scalingCell(0.5 * i_dt / i_dx, diffCell(conservationFlux_x(uVec_2_R), conservationFlux_x(uVec_2_L))));
 
     // full time leap using the FORCE scheme
     return forceFlux_x(uVec_1_R, uVec_2_L, i_dx, i_dt);
@@ -124,7 +124,7 @@ std::array<double, 4> FluxFVM::slicFlux_y(std::array<double, 4> i_uVector_0, std
 
     // locally half time evolve
     uVec_1_R = diffCell(uVec_1_R, scalingCell(0.5 * i_dt / i_dy, diffCell(conservationFlux_y(uVec_1_R), conservationFlux_y(uVec_1_L))));
-    uVec_2_L = diffCell(uVec_1_L, scalingCell(0.5 * i_dt / i_dy, diffCell(conservationFlux_y(uVec_1_R), conservationFlux_y(uVec_1_L))));
+    uVec_2_L = diffCell(uVec_2_L, scalingCell(0.5 * i_dt / i_dy, diffCell(conservationFlux_y(uVec_2_R), conservationFlux_y(uVec_2_L))));
 
     // full time leap using the FORCE scheme
     return forceFlux_y(uVec_1_R, uVec_2_L, i_dy, i_dt);
