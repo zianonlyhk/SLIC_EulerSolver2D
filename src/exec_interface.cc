@@ -6,7 +6,7 @@
 /*   By: Zian Huang <zianhuang00@gmail.com>           || room214n.com ||      */
 /*                                                    ##################      */
 /*   Created: 2022/11/09 19:14:25 by Zian Huang                               */
-/*   Updated: 2022/11/16 13:27:10 by Zian Huang                               */
+/*   Updated: 2022/11/20 14:08:15 by Zian Huang                               */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,22 +15,8 @@
 #include <fstream>
 #include <iostream>
 
-void DEBUG_printOutVecRho(std::vector<std::vector<std::array<double, 4>>> const &i_inputVec)
-{
-    int nCellY = i_inputVec.size();
-    int nCellX = i_inputVec[0].size();
-    for (int j = 0; j < nCellY; ++j)
-    {
-        for (int i = 0; i < nCellX; ++i)
-        {
-            std::cout << i_inputVec[j][i][0] << ' ';
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-    std::cout << std::endl;
-}
-
+// the following initial value set was copied from Steve's ACM1 practical 2
+// these values are all in primitive form: density, xMomentum, yMomentum, pressure
 void setInitRiemannValue(std::vector<std::vector<std::array<double, 4>>> &i_inputVec, double i_x0, double i_x1, double i_y0, double i_y1)
 {
     int nCell_y = i_inputVec.size() - 4;
@@ -52,28 +38,30 @@ void setInitRiemannValue(std::vector<std::vector<std::array<double, 4>>> &i_inpu
             {
                 if (currY < 0.5)
                 {
-                    i_inputVec[j][i] = (std::array<double, 4>){0.8, 0, 0, 1};
+                    i_inputVec[j][i] = (std::array<double, 4>){1, -0.75, 0.5, 1};
                 }
                 else
                 {
-                    i_inputVec[j][i] = (std::array<double, 4>){1, 0.7276, 0, 1};
+                    i_inputVec[j][i] = (std::array<double, 4>){2, 0.75, 0.5, 1};
                 }
             }
             else
             {
                 if (currY < 0.5)
                 {
-                    i_inputVec[j][i] = (std::array<double, 4>){1, 0, 0.7276, 1};
+                    i_inputVec[j][i] = (std::array<double, 4>){3, -0.75, -0.5, 1};
                 }
                 else
                 {
-                    i_inputVec[j][i] = (std::array<double, 4>){0.5313, 0, 0, 0.4};
+                    i_inputVec[j][i] = (std::array<double, 4>){1, 0.75, -0.5, 1};
                 }
             }
         }
     }
 }
 
+// since we need to work in conservation form as we adapted finite volume method
+// the following local function will transform our initial primitive conditions into conservative form
 void conservativeFormTransform(std::vector<std::vector<std::array<double, 4>>> &i_inputVec)
 {
     double localGamma = 1.4;
@@ -98,23 +86,6 @@ void conservativeFormTransform(std::vector<std::vector<std::array<double, 4>>> &
     }
 }
 
-void writeToFileStream(std::ofstream &i_fstream, std::vector<std::vector<std::array<double, 4>>> const &i_inputVec, double i_x0, double i_dx, double i_y0, double i_dy, double i_t, int i_idx)
-{
-    int nCell_y = i_inputVec.size() - 4;
-    int nCell_x = i_inputVec[0].size() - 4;
-
-    for (int j = 2; j < nCell_y + 2; ++j)
-    {
-        for (int i = 2; i < nCell_x + 2; ++i)
-        {
-            i_fstream << i_t << ' ' << i_y0 + (j - 2) * i_dy << ' ' << i_x0 + (i - 2) * i_dx << ' ' << i_inputVec[j][i][i_idx] << std::endl;
-        }
-
-        i_fstream << std::endl;
-    }
-    i_fstream << std::endl;
-}
-
 int main()
 {
     // some constant declarations and definitions here
@@ -132,8 +103,8 @@ int main()
     x1 = 1.0;
     y0 = 0.0;
     y1 = 1.0;
-    c = 0.8;
-    tStop = 0.3;
+    c = 0.9;
+    tStop = 0.5;
 
     // prepare the vector of vectors of arrays
     std::vector<std::vector<std::array<double, 4>>> compDomain;
@@ -148,97 +119,47 @@ int main()
     // primitive input to conservative variables
     conservativeFormTransform(compDomain);
 
-    // create a class instance and update the boundary to fill in the gap
-    SLIC_2D_EulerSolver testSolverClass(compDomain, nCells_x, nCells_y, x0, x1, y0, y1, c, tStop);
+    // create a class instance
+    SLIC_2D_EulerSolver testSolverClass(compDomain, nCells_x, nCells_y);
+    // update its private members
+    testSolverClass.setBound(x0, x1, y0, y1, tStop);
+    testSolverClass.setCFL(c);
+    testSolverClass.setName((std::string) "test");
+    testSolverClass.setRepoDir((std::string) "/Users/zianhuang/Room214N/dev/SLIC_EulerSolver2D/");
+
     testSolverClass.updateBoundary();
 
-    // now the initial conditions are ready
-    // setting fstream ##################################################################################
-    std::ofstream rhoResults;
-    std::ofstream momentumX_Results;
-    std::ofstream momentumY_Results;
-    std::ofstream energyResults;
-    std::string rhoResultsDir;
-    std::string momentumX_ResultsDir;
-    std::string momentumY_ResultsDir;
-    std::string energyResultsDir;
-    rhoResultsDir = "/Users/zianhuang/Room214N/dev/SLIC_EulerSolver2D/data/rhoResults.dat";
-    momentumX_ResultsDir = "/Users/zianhuang/Room214N/dev/SLIC_EulerSolver2D/data/momentumX_Results.dat";
-    momentumY_ResultsDir = "/Users/zianhuang/Room214N/dev/SLIC_EulerSolver2D/data/momentumY_Results.dat";
-    energyResultsDir = "/Users/zianhuang/Room214N/dev/SLIC_EulerSolver2D/data/energyResults.dat";
-    rhoResults.open(rhoResultsDir);
-    momentumX_Results.open(momentumX_ResultsDir);
-    momentumY_Results.open(momentumY_ResultsDir);
-    energyResults.open(energyResultsDir);
-    // writing initial conditions to files
-    writeToFileStream(rhoResults, compDomain, x0, testSolverClass.dx_, y0, testSolverClass.dy_, 0, 0);
-    writeToFileStream(momentumX_Results, compDomain, x0, testSolverClass.dx_, y0, testSolverClass.dy_, 0, 1);
-    writeToFileStream(momentumY_Results, compDomain, x0, testSolverClass.dx_, y0, testSolverClass.dy_, 0, 2);
-    writeToFileStream(energyResults, compDomain, x0, testSolverClass.dx_, y0, testSolverClass.dy_, 0, 3);
-    // ##################################################################################################
+    testSolverClass.initiate();
 
+    // starting the numerical scheme #############################################################
     // preparing the while loop
     double t = 0.0;
     int numIter = 0;
     do
     {
-        // give it a smaller c when first starting the algorithm
-        if (numIter < 10)
-        {
-            testSolverClass.c_ = 0.3;
-            ++numIter;
+        ++numIter;
 
-            // preparation for time leap
-            testSolverClass.updateMaxA();
-            testSolverClass.updateDt();
+        // preparation for time leap
+        testSolverClass.updateMaxA(numIter);
+        testSolverClass.updateDt();
 
-            // time progressing forward
-            t += testSolverClass.dt_;
-            std::cout << t << std::endl;
+        // time leaping forward
+        t += testSolverClass.dt();
+        // std::cout << t << std::endl;
 
-            // matrix transform
-            testSolverClass.slicLeapX();
-            testSolverClass.updateBoundary();
-            testSolverClass.slicLeapY();
-            testSolverClass.updateBoundary();
+        // matrix transform
+        testSolverClass.slicLeapX();
+        testSolverClass.updateBoundary();
+        testSolverClass.slicLeapY();
+        testSolverClass.updateBoundary();
 
-            writeToFileStream(rhoResults, testSolverClass.uVec_, testSolverClass.x0_, testSolverClass.dx_, testSolverClass.y0_, testSolverClass.dy_, t, 0);
-            writeToFileStream(momentumX_Results, testSolverClass.uVec_, testSolverClass.x0_, testSolverClass.dx_, testSolverClass.y0_, testSolverClass.dy_, t, 1);
-            writeToFileStream(momentumY_Results, testSolverClass.uVec_, testSolverClass.x0_, testSolverClass.dx_, testSolverClass.y0_, testSolverClass.dy_, t, 2);
-            writeToFileStream(energyResults, testSolverClass.uVec_, testSolverClass.x0_, testSolverClass.dx_, testSolverClass.y0_, testSolverClass.dy_, t, 3);
-        }
-        else
-        // now return to our normal c = 0.8
-        {
-            testSolverClass.c_ = 0.8;
+        // writing current time frame to the output file
+        testSolverClass.writeToFiles(t);
 
-            // preparation for time leap
-            testSolverClass.updateMaxA();
-            testSolverClass.updateDt();
-
-            // time progressing forward
-            t += testSolverClass.dt_;
-            std::cout << t << std::endl;
-
-            // matrix transform
-            testSolverClass.slicLeapX();
-            testSolverClass.updateBoundary();
-            testSolverClass.slicLeapY();
-            testSolverClass.updateBoundary();
-
-            writeToFileStream(rhoResults, testSolverClass.uVec_, testSolverClass.x0_, testSolverClass.dx_, testSolverClass.y0_, testSolverClass.dy_, t, 0);
-            writeToFileStream(momentumX_Results, testSolverClass.uVec_, testSolverClass.x0_, testSolverClass.dx_, testSolverClass.y0_, testSolverClass.dy_, t, 1);
-            writeToFileStream(momentumY_Results, testSolverClass.uVec_, testSolverClass.x0_, testSolverClass.dx_, testSolverClass.y0_, testSolverClass.dy_, t, 2);
-            writeToFileStream(energyResults, testSolverClass.uVec_, testSolverClass.x0_, testSolverClass.dx_, testSolverClass.y0_, testSolverClass.dy_, t, 3);
-        }
-
-    } while (t < testSolverClass.tStop_);
+    } while (t < testSolverClass.tStop());
 
     // closing the fstream
-    rhoResults.close();
-    momentumX_Results.close();
-    momentumY_Results.close();
-    energyResults.close();
+    testSolverClass.cleanUp();
 
     return 0;
 }

@@ -6,7 +6,7 @@
 /*   By: Zian Huang <zianhuang00@gmail.com>           || room214n.com ||      */
 /*                                                    ##################      */
 /*   Created: 2022/11/09 19:14:28 by Zian Huang                               */
-/*   Updated: 2022/11/16 13:26:04 by Zian Huang                               */
+/*   Updated: 2022/11/20 11:21:32 by Zian Huang                               */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 #include "inline/primitive_tran.hh"
 #include "inline/cell_operation.hh"
 
-FluxFVM::FluxFVM()
-{
-}
+// default constructor
+FluxFVM::FluxFVM() {}
 
+// x-direction conservation flux of the Euler system of equations, ToroBook p3
 std::array<double, 4> FluxFVM::conservationFlux_x(std::array<double, 4> i_inputVec)
 {
     std::array<double, 4> arrayToBeReturned;
@@ -30,6 +30,7 @@ std::array<double, 4> FluxFVM::conservationFlux_x(std::array<double, 4> i_inputV
     return arrayToBeReturned;
 }
 
+// y-direction conservation flux of the Euler system of equations, ToroBook p3
 std::array<double, 4> FluxFVM::conservationFlux_y(std::array<double, 4> i_inputVec)
 {
     std::array<double, 4> arrayToBeReturned;
@@ -42,6 +43,7 @@ std::array<double, 4> FluxFVM::conservationFlux_y(std::array<double, 4> i_inputV
     return arrayToBeReturned;
 }
 
+// FORCE numerical schemes using the conservation flux functions defined in the above
 std::array<double, 4> FluxFVM::forceFlux_x(std::array<double, 4> i_uVector_i, std::array<double, 4> i_uVector_i_next, double i_dx, double i_dt)
 {
     std::array<double, 4> lfFluxArr;
@@ -64,6 +66,7 @@ std::array<double, 4> FluxFVM::forceFlux_y(std::array<double, 4> i_uVector_i, st
     return scalingCell(0.5, sumCell(lfFluxArr, conservationFlux_y(riTempArr)));
 }
 
+// SLIC schemes using the direction specific FORCE schemes defined in the above
 std::array<double, 4> FluxFVM::slicFlux_x(std::array<double, 4> i_uVector_0, std::array<double, 4> i_uVector_1, std::array<double, 4> i_uVector_2, std::array<double, 4> i_uVector_3, double i_dx, double i_dt)
 {
     // const parameter
