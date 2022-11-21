@@ -6,7 +6,7 @@
 /*   By: Zian Huang <zianhuang00@gmail.com>           || room214n.com ||      */
 /*                                                    ##################      */
 /*   Created: 2022/11/09 19:14:43 by Zian Huang                               */
-/*   Updated: 2022/11/20 13:44:47 by Zian Huang                               */
+/*   Updated: 2022/11/20 19:42:40 by Zian Huang                               */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,11 @@ public:
     // loosely packed tools to update private members
     void updateMaxA(int numIter);
     void updateDt();
-    void updateBoundary();
+    void updateBoundary_transmissive();
+    void updateBoundary_cylindrical();
     void slicLeapX();
     void slicLeapY();
+    void cylindricalSourceTermLeap();
     // utilities for outputing results
     void initiate();
     void writeToFiles(double time);

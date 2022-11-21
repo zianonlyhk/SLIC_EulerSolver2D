@@ -6,7 +6,7 @@
 /*   By: Zian Huang <zianhuang00@gmail.com>           || room214n.com ||      */
 /*                                                    ##################      */
 /*   Created: 2022/11/09 19:14:44 by Zian Huang                               */
-/*   Updated: 2022/11/20 14:04:26 by Zian Huang                               */
+/*   Updated: 2022/11/20 19:44:58 by Zian Huang                               */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,10 +74,6 @@ SLIC_2D_EulerSolver::SLIC_2D_EulerSolver(std::vector<std::vector<std::array<doub
 
     // define the initial conditions, the initial full computational space
     uVec_ = i_uVec;
-
-    // updateBoundary();
-    // updateMaxA(0);
-    // updateDt();
 }
 
 void SLIC_2D_EulerSolver::setName(std::string i_name)
@@ -157,61 +153,56 @@ void SLIC_2D_EulerSolver::updateDt()
     dt_ = c_ * smallerD / aMax_;
 }
 
-void SLIC_2D_EulerSolver::updateBoundary()
+void SLIC_2D_EulerSolver::updateBoundary_transmissive()
 {
     // transmissive boundary
-    //
-    // in the following simple case, the integral boundary, 1-8, shares the same value with its shift complement, !-*
-    // 1-!, 2-@, 3-#, 4-$, 5-%, 6-^, 7-&, 8-*
-    //
-    //
-    // 1 1  1 8 7  7 7
-    // 1 1  1 8 7  7 7
-    //
-    // 1 1  ! * &  7 7
-    // 2 2  @ & ^  6 6
-    // 3 3  # $ %  5 5
-    //
-    // 3 3  3 4 5  5 5
-    // 3 3  3 4 5  5 5
-
     // updating boundaries in the x-axis
     for (int i = 2; i < nCell_y_ + 2; ++i)
     {
-        uVec_[i][0] = uVec_[i][2];
+        uVec_[i][0] = uVec_[i][3];
         uVec_[i][1] = uVec_[i][2];
-        uVec_[i][nCell_x_ + 3] = uVec_[i][nCell_x_ + 1];
+        uVec_[i][nCell_x_ + 3] = uVec_[i][nCell_x_];
         uVec_[i][nCell_x_ + 2] = uVec_[i][nCell_x_ + 1];
     }
     // updating boundaries in the y-axis
     for (int i = 2; i < nCell_x_ + 2; ++i)
     {
-        uVec_[0][i] = uVec_[2][i];
+        uVec_[0][i] = uVec_[3][i];
         uVec_[1][i] = uVec_[2][i];
-        uVec_[nCell_y_ + 3][i] = uVec_[nCell_y_ + 1][i];
+        uVec_[nCell_y_ + 3][i] = uVec_[nCell_y_][i];
         uVec_[nCell_y_ + 2][i] = uVec_[nCell_y_ + 1][i];
     }
+}
 
-    // left upper corner
-    uVec_[0][0] = uVec_[2][2];
-    uVec_[0][1] = uVec_[2][2];
-    uVec_[1][0] = uVec_[2][2];
-    uVec_[1][1] = uVec_[2][2];
-    // right upper corner
-    uVec_[0][nCell_x_ + 3] = uVec_[2][nCell_x_ + 1];
-    uVec_[0][nCell_x_ + 2] = uVec_[2][nCell_x_ + 1];
-    uVec_[1][nCell_x_ + 2] = uVec_[2][nCell_x_ + 1];
-    uVec_[1][nCell_x_ + 3] = uVec_[2][nCell_x_ + 1];
-    // left lower corner
-    uVec_[nCell_y_ + 2][0] = uVec_[nCell_y_ + 1][2];
-    uVec_[nCell_y_ + 2][1] = uVec_[nCell_y_ + 1][2];
-    uVec_[nCell_y_ + 3][0] = uVec_[nCell_y_ + 1][2];
-    uVec_[nCell_y_ + 3][1] = uVec_[nCell_y_ + 1][2];
-    // right lower corner
-    uVec_[nCell_y_ + 3][nCell_x_ + 3] = uVec_[nCell_y_ + 1][nCell_x_ + 1];
-    uVec_[nCell_y_ + 2][nCell_x_ + 2] = uVec_[nCell_y_ + 1][nCell_x_ + 1];
-    uVec_[nCell_y_ + 2][nCell_x_ + 3] = uVec_[nCell_y_ + 1][nCell_x_ + 1];
-    uVec_[nCell_y_ + 3][nCell_x_ + 2] = uVec_[nCell_y_ + 1][nCell_x_ + 1];
+void SLIC_2D_EulerSolver::updateBoundary_cylindrical()
+{
+    // cylindrical coordinate boundary update, reflective in vel_r
+    // updating boundaries in the x-axis
+    for (int i = 2; i < nCell_y_ + 2; ++i)
+    {
+        uVec_[i][0] = uVec_[i][3];
+        uVec_[i][1] = uVec_[i][2];
+        uVec_[i][nCell_x_ + 3] = uVec_[i][nCell_x_];
+        uVec_[i][nCell_x_ + 2] = uVec_[i][nCell_x_ + 1];
+
+        uVec_[i][0][1] = -uVec_[i][3][1];
+        uVec_[i][1][1] = -uVec_[i][2][1];
+        uVec_[i][nCell_x_ + 3][1] = -uVec_[i][nCell_x_][1];
+        uVec_[i][nCell_x_ + 2][1] = -uVec_[i][nCell_x_ + 1][1];
+    }
+    // updating boundaries in the y-axis
+    for (int i = 2; i < nCell_x_ + 2; ++i)
+    {
+        uVec_[0][i] = uVec_[3][i];
+        uVec_[1][i] = uVec_[2][i];
+        uVec_[nCell_y_ + 3][i] = uVec_[nCell_y_][i];
+        uVec_[nCell_y_ + 2][i] = uVec_[nCell_y_ + 1][i];
+
+        uVec_[i][0][1] = -uVec_[i][3][1];
+        uVec_[i][1][1] = -uVec_[i][2][1];
+        uVec_[i][nCell_x_ + 3][1] = -uVec_[i][nCell_x_][1];
+        uVec_[i][nCell_x_ + 2][1] = -uVec_[i][nCell_x_ + 1][1];
+    }
 }
 
 void SLIC_2D_EulerSolver::slicLeapX()
@@ -222,6 +213,11 @@ void SLIC_2D_EulerSolver::slicLeapX()
 void SLIC_2D_EulerSolver::slicLeapY()
 {
     uVec_ = vecTran.slicVecTran_y(uVec_, dy_, dt_);
+}
+
+void SLIC_2D_EulerSolver::cylindricalSourceTermLeap()
+{
+    uVec_ = vecTran.cylindricalGeometricRK2(uVec_, dx_, dt_);
 }
 
 void SLIC_2D_EulerSolver::initiate()

@@ -6,7 +6,7 @@
 /*   By: Zian Huang <zianhuang00@gmail.com>           || room214n.com ||      */
 /*                                                    ##################      */
 /*   Created: 2022/11/09 19:14:25 by Zian Huang                               */
-/*   Updated: 2022/11/20 14:08:15 by Zian Huang                               */
+/*   Updated: 2022/11/21 10:58:33 by Zian Huang                               */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,8 @@ int main()
     x1 = 1.0;
     y0 = 0.0;
     y1 = 1.0;
-    c = 0.9;
-    tStop = 0.5;
+    c = 0.8;
+    tStop = 1.6;
 
     // prepare the vector of vectors of arrays
     std::vector<std::vector<std::array<double, 4>>> compDomain;
@@ -127,7 +127,7 @@ int main()
     testSolverClass.setName((std::string) "test");
     testSolverClass.setRepoDir((std::string) "/Users/zianhuang/Room214N/dev/SLIC_EulerSolver2D/");
 
-    testSolverClass.updateBoundary();
+    testSolverClass.updateBoundary_cylindrical();
 
     testSolverClass.initiate();
 
@@ -145,16 +145,22 @@ int main()
 
         // time leaping forward
         t += testSolverClass.dt();
-        // std::cout << t << std::endl;
 
         // matrix transform
         testSolverClass.slicLeapX();
-        testSolverClass.updateBoundary();
+        testSolverClass.updateBoundary_cylindrical();
         testSolverClass.slicLeapY();
-        testSolverClass.updateBoundary();
+        testSolverClass.updateBoundary_cylindrical();
+
+        testSolverClass.cylindricalSourceTermLeap();
+        testSolverClass.updateBoundary_cylindrical();
 
         // writing current time frame to the output file
-        testSolverClass.writeToFiles(t);
+        if (numIter % 6 == 0)
+        {
+            testSolverClass.writeToFiles(t);
+            std::cout << t << " / " << testSolverClass.tStop() << std::endl;
+        }
 
     } while (t < testSolverClass.tStop());
 
