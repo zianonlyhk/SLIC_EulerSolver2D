@@ -86,8 +86,7 @@ Temporary Items
 
 # Zian adding
 
-bin/*
-data/*
-obj/*
-test
-test/*
+bin/slic_solver_2d
+data/*.dat
+data/gif/*.gif
+obj/*.o

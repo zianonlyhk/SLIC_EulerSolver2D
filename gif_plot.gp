@@ -2,7 +2,7 @@
 
 cd 'data'
 
-set terminal gif animate delay 3
+set terminal gif animate delay 10
 set output 'gif/rhoPlot.gif'
 set hidden3d
 stats 'test_rhoResults.dat' using 4 nooutput
@@ -16,7 +16,7 @@ do for [i=1:int(STATS_blocks)-1] {
     splot 'test_rhoResults.dat' index (i-1) using 3:2:4 with lines palette notitle
 }
 
-set terminal gif animate delay 3
+set terminal gif animate delay 10
 set output 'gif/momentumX_Plot.gif'
 set hidden3d
 stats 'test_momentumX_Results.dat' using 4 nooutput
@@ -30,7 +30,7 @@ do for [i=1:int(STATS_blocks)-1] {
     splot 'test_momentumX_Results.dat' index (i-1) using 2:3:4 with lines palette notitle
 }
 
-set terminal gif animate delay 3
+set terminal gif animate delay 10
 set output 'gif/momentumY_Plot.gif'
 set hidden3d
 stats 'test_momentumY_Results.dat' using 4 nooutput
@@ -44,7 +44,7 @@ do for [i=1:int(STATS_blocks)-1] {
     splot 'test_momentumY_Results.dat' index (i-1) using 2:3:4 with lines palette notitle
 }
 
-set terminal gif animate delay 3
+set terminal gif animate delay 10
 set output 'gif/energyPlot.gif'
 set hidden3d
 stats 'test_energyResults.dat' using 4 nooutput

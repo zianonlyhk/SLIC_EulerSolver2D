@@ -125,7 +125,7 @@ int main()
     testSolverClass.setBound(x0, x1, y0, y1, tStop);
     testSolverClass.setCFL(c);
     testSolverClass.setName((std::string) "test");
-    testSolverClass.setRepoDir((std::string) "/Users/zianhuang/Room214N/dev/SLIC_EulerSolver2D/");
+    testSolverClass.setRepoDir((std::string) "/Users/zian/Room214N/github/SLIC_EulerSolver2D/");
 
     testSolverClass.updateBoundary_cylindrical();
 
@@ -156,7 +156,7 @@ int main()
         testSolverClass.updateBoundary_cylindrical();
 
         // writing current time frame to the output file
-        if (numIter % 6 == 0)
+        if (numIter % 20 == 0)
         {
             testSolverClass.writeToFiles(t);
             std::cout << t << " / " << testSolverClass.tStop() << std::endl;

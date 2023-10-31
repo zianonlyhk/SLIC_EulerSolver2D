@@ -20,8 +20,13 @@ C++ compiler and Make software are required but they are shipped by default in m
 
 ## Usage <a name = "usage"></a>
 
-I will type the following on my machine under the repo directory:
+I first edit the absolute directory of the repo on line 128 of the file "`src/exec_interface.cc`" with the correct value, in this case it's "`/Users/zian/Room214N/github/SLIC_EulerSolver2D/`". Notice that it ends with a "`/`".
+
+I will then type the following command on my mac terminal under the repo directory:
 
 ````
 make && ./bin/slic_solver_2d && ./gif_plot.gp
 ````
+
+An example set of density solutions is presented as:
+![](https://github.com/zianonlyhk/SLIC_EulerSolver2D/rhoPlot.gif)
