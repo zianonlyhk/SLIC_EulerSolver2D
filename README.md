@@ -29,4 +29,5 @@ make && ./bin/slic_solver_2d && ./gif_plot.gp
 ````
 
 An example set of density solutions is presented as:
+
 ![](https://raw.githubusercontent.com/zianonlyhk/SLIC_EulerSolver2D/main/rhoPlot.gif)
